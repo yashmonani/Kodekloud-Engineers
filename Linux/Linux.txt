@@ -1,0 +1,156 @@
+Linux - Level 1 - 02/2026
+
+2. Group Creation and User Assignment
+  For stapp01 -
+	ssh user1@<ip_addr>
+	sudo su -
+	groupadd nautilus_noc
+	useradd -G nautilus_noc jarod
+  similarly do this for stapp02 and stapp03
+
+3. Linux User Setup with Non-Interactive Shell
+  ssh tony@172.16.238.10
+  sudo useradd -s /sbin/nologin anita
+
+4. Service User Creation without Home Directory
+  ssh banner@172.16.238.12
+  sudo useradd -M jim
+
+5. Temporary User Setup with Expiry
+  ssh steve@172.16.238.11
+  sudo useradd -e 2017-2-17 james
+
+6. Linux User Data Transfer
+  find /home/usersdata/ -type f -user james -exec cp --parents {} /beta \;
+  /home/usersdata/: The starting point for the search.
+
+  -type f: Filters for files only (ignoring directories).
+  -user james: Filters for files owned by the user "james".
+  -exec ... \;: Runs the following command on every file found.
+  cp --parents {} /beta: The {} is a placeholder for the filename found. 
+  The --parents flag recreates the source path inside the destination /beta
+
+7. Secure Root SSH Access
+   Do this for all users on app servers
+   ssh user@ip
+   sudo su -
+   vi /etc/ssh/sshd_config
+   change -> PermitRootLogin no
+   :wq!
+   systemctl restart sshd
+
+8. Data Backup for Developer
+   ssh user@ip (ssh to Nautilus storage server user)
+   tar -czvf mariyam.tar.gz /data/mariyam/
+   sudo mv mariyam.tar.gz /home
+   to check -> ls /home  
+
+9. Script Execution Permissions
+   ssh name@ip
+   sudo chmod 755 /tmp/xfusioncorp.sh
+
+10. File Permission Correction
+    ssh user@ip
+    sudo su -
+    chown root:root /etc/hosts
+    chmod 644 /etc/hosts
+    setfacl -m u:ravi:--- /etc/hosts
+    setfacl -m u:eric:r-- /etc/hosts
+    getfacl /etc/hosts
+
+
+11. String Replacement
+    ssh to backup server
+    sudo su -
+    sed -i 's/About/Software/g' /root/nautilus.xml
+
+12. Secure Data Transfer
+    scp /tmp/nautilus.txt.gpg app3_user@ip:/home/webapp
+
+13. Restrict Cron Access
+    ssh app2@ip
+    sudo su -
+    touch /etc/cron.allow
+    touch /etc/cron.deny
+    echo "ammar" >> /etc/cron.allow
+    echo "garrett" >> /etc/cron.deny
+
+14. Default GUI Boot Configuration
+    ssh to all app user and run on all 3 app server  - 
+    sudo systemctl set-default graphical.target
+
+15. Timezone Alignment
+    ssh to all app servers and run this cmd on all servers(change time as mentioned)
+    sudo su -
+    timedatectl set-timezone America/Bahia_Banderas
+
+16. Firewall Configuration
+    ssh backup_server@ip
+    sudo su -
+    firewall-cmd --zone=public --add-port=5004/tcp --permanent
+    firewall-cmd --reload
+    firewall-cmd --get-default-zone
+    ss -tln 
+
+17. Process Limit Adjustment 
+    ssh storage@ip
+    sudo su -
+    vi /etc/security/limits.conf
+    write at the last - 
+    nfsuser soft nproc 1026
+    nfsuser hard nproc 2027
+    to check - 
+    tail -n 5 /etc/security/limits.conf
+
+18. SElinux Installation and Configuration
+    ssh tony@ip
+    sudo su -
+    yum install selinux-policy selinux-policy-targeted policycoreutils
+    vi /etc/selinux/config
+    change - 
+    SELINUX=enforcing
+    to 
+    SELINUX=disabled
+    save and exit
+
+Final test. 
+    sudo su -
+
+    chage -e john
+
+    find /home/usersdata -type f -user john -exec cp --parents -a {} /beta/ \;
+
+    useradd -s /sbin/nologin rod
+
+    cd /var/www/html , echo "Welcome to the KKE labs!" >> index.html
+    
+    setfacl -m u:virat:--- /etc/hosts
+    setfacl -m u:vivek:r-- /etc/hosts
+    setfacl -m g:sysadmin:rw- /etc/hosts
+
+   ssh storage@ip
+   tar -xvf /home/natasha/archive.tar -C /tmp
+  
+   sed '/following/d' /home/BSD.txt > /home/BSD_DELETE.txt
+   sed 's/\bor\b/them/g' /home/BSD.txt > /home/BSD_REPLACE.txt
+
+   yum install httpd -y
+   systemctl enable --now httpd
+   systemctl status httpd
+
+   yum install bind , on all app server
+   systemctl enable --now named
+
+   yum remove logrotate
+
+
+   
+
+
+
+
+
+
+
+
+
