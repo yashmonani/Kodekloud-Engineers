@@ -1,0 +1,51 @@
+1. Install Docker Packages and Start Docker Service
+	ssh to appserver 2
+	sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+	sudo yum install -y docker-ce docker-ce-cli containerd.io
+	systemctl enable --now docker
+
+2. Deploy Nginx Container on Application Server
+	ssh to server
+	docker run -d --name nginx_1 nginx:alpine
+	docker ps
+
+3. Delete Docker Container
+	ssh to server
+	docker stop 959
+	docker rm 959
+
+4. Copy File to Docker Container
+	docker cp /tmp/nautilus.txt.gpg ubuntu_latest:/opt/
+
+5. Troubleshoot Docker Container Issue
+	ssh to server 1
+	docker inspect nautilus (look for Binds, HostPort)
+	docker image ls
+	docker run -d 8803
+	curl http://localhost:8080/
+	docker ps
+
+Final - 
+	docker run -d --name nginx_1 nginx:alpine
+
+	docker run -d --name debug_1 ubuntu/apache2:latest sleep 1000
+
+	docker cp /tmp/nautilus.txt.gpg ubuntu_latest:/usr/src
+
+	docker cp development_3:/tmp/test.txt.gpg /tmp
+
+	docker rmi alpine:3.18.4
+	docker rmi -f sebp/lighttpd:latest
+
+	docker commit alpine_nautilus alpine:nautilus
+
+	docker network create --driver bridge --subnet 182.18.0.0/24 --gateway 182.18.0.1 mysql-network
+
+	docker network rm php-network
+
+	docker start 2e8d1
+	docker start 9437e4
+
+
+	
