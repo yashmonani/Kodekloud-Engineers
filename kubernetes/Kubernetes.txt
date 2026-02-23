@@ -1,0 +1,358 @@
+Kubernetes Level-1, 02/26 , test score 80% , due Q3,10
+
+
+2. Deploy Applications with Kubernetes Deployments
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd
+  labels:
+    app: httpd
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd-container
+        image: httpd:latest
+
+3. Setup Kubernetes Namespaces and PODs
+kubectl create ns dev
+
+vi dev-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+    name: dev-nginx-pod
+spec:
+   containers:
+   - name: dev-nginx-pod
+     image: nginx:latest
+
+kubectl create -f dev-pod.yaml -n dev
+
+4. Set Resource Limits in Kubernetes Pods
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: httpd-pod
+spec:
+  containers:
+  - name: httpd-container
+    image: httpd:latest
+    resources:
+      requests:
+        memory: "15Mi"
+        cpu: "100m"
+      limits:
+        memory: "20Mi"
+        cpu: "100m
+
+
+5. Execute Rolling Updates in Kubernetes
+
+kubectl get po
+kubectl describe po <pod_name>
+kubectl get deployment
+kubectl set image deployment/nginx-deployment nginx-container=nginx:1.17
+
+6. Revert Deployment to Previous Version in Kubernetes
+
+kubectl rollout undo deployment nginx-deployment
+
+7. Deploy ReplicaSet in Kubernetes Cluster
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-replicaset
+  labels:
+    app: nginx_app
+    type: front-end
+spec:
+  # The number of desired instances
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx_app
+      type: front-end
+  template:
+    metadata:
+      labels:
+        app: nginx_app
+        type: front-end
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:latest
+
+kubectl get all
+
+8. Schedule Cronjobs in Kubernetes
+
+vi cron.yaml
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: xfusion
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cron-xfusion
+              image: nginx:latest
+              command:
+                - /bin/sh
+                - -c
+                - echo "Welcome to xfusioncorp!"
+          restartPolicy: OnFailure
+
+kubectl create -f cron.yaml 
+kubectl get cronjob
+
+9. Create Countdown Job in Kubernetes
+
+vi job.yaml
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: countdown-nautilus
+spec:
+  template:
+    metadata:
+      name: countdown-nautilus
+    spec:
+      containers:
+      - name: container-countdown-nautilus
+        image: fedora:latest
+        command: ["sleep", "5"]
+      restartPolicy: Never
+
+kubectl create -f job.yaml
+
+10. Set Up Time Check Pod in Kubernetes
+
+vi config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: time-config
+  namespace: xfusion
+data:
+  TIME_FREQ: "5"
+
+kubectl create -f config.yaml
+
+vi pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: time-check
+  namespace: xfusion
+  labels:
+    app: time-check
+spec:
+  containers:
+  - name: time-check
+    image: busybox:latest
+    command: ["/bin/sh", "-c", "while true; do date; sleep $TIME_FREQ; done > /opt/sysops/time/time-check.log"]
+    env:
+    - name: TIME_FREQ
+      valueFrom:
+        configMapKeyRef:
+          name: time-config
+          key: TIME_FREQ
+    volumeMounts:
+    - name: log-volume
+      mountPath: /opt/sysops/time
+  volumes:
+  - name: log-volume
+    emptyDir: {}
+
+kubectl create -f pod.yaml
+
+11. Resolve Pod Deployment Issue
+
+kubectl get pod
+kubectl describe pod webserver (there was a typo , nginx:latests)
+kubectl edit pod webserver (change to nginx:latest)
+
+12. Update Deployment and Service in Kubernetes
+
+kubectl get deployment
+kubectl edit deployment nginx-deployment (press i, change replica count and image version , wq! enter)
+kubectl get svc 
+kubectl edit svc nginx-service
+
+13. Deploy Highly Available Pods with ReplicationController
+
+vi rc.yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: httpd-replicationcontroller
+  labels:
+    app: httpd_app
+    type: front-end
+spec:
+  replicas: 3
+  selector:
+    app: httpd_app
+    type: front-end
+  template:
+    metadata:
+      labels:
+        app: httpd_app
+        type: front-end
+    spec:
+      containers:
+      - name: httpd-container
+        image: httpd:latest
+
+kubectl create -f rc.yaml 
+
+14. Resolve VolumeMounts Issue in Kubernetes
+
+kubectl get pod nginx-phpfpm -o  YAML  > resolve.yaml
+vi resolve.yaml
+change mountPath of image: nginx:latest named shared-files to /var/www/html
+kubectl delete -f resolve.yaml
+kubectl create -f resolve.yaml
+kubectl cp /home/thor/index.php nginx-phpfpm:/var/www/html -c nginx-container
+
+now website is accessible
+
+
+Final - 
+
+vi pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dummy-nginx-httpd-t1q6
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:stable-alpine3.17-slim
+
+
+cd /usr/official-t1q2/
+vi official-t1q2.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: official-nginx-t1q2
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+kubectl create -f official-t1q2.yml
+
+
+kubectl rollout undo deployment nginx-deployment-t2q2
+
+
+kubectl delete deployment web-app-t2q4
+
+
+vi pod2.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: httpd-pod-t3q6
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: httpd-container-t3q6
+    image: httpd:latest
+    resources:
+      requests:
+        memory: "15Mi"
+        cpu: "100m"
+      limits:
+        memory: "20Mi"
+        cpu: "100m"
+
+kubectl create -f pod2.yaml
+
+
+vi job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: countdown-datacenter-t3q2
+spec:
+  template:
+    metadata:
+      name: countdown-datacenter-t3q2
+    spec:
+      containers:
+      - name: container-countdown-datacenter-t3q2
+        image: fedora:latest
+        command: ["sleep", "5"]
+      restartPolicy: Never
+
+kubectl create -f job.yaml
+
+
+kubectl edit service nginx-service-t2q2
+change nodePort to given port
+
+
+kubectl get pod nginx-phpfpm-t4q3 -o  YAML  > resolve.yaml
+vi resolve.yaml
+change mountPath of image: nginx:latest named shared-files to /var/www/html
+kubectl delete -f resolve.yaml
+kubectl create -f resolve.yaml
+kubectl cp /home/thor/index.php nginx-phpfpm-t4q3:/var/www/html -c nginx-container
+
+now website is accessible
+
+
+kubectl edit service service-t5q3
+change nodePort to given port
+
+vi service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-service-t5q1
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30004
+
+kubectl apply -f service.yaml
+
+
+
+
+
+
+
+
+
+
+
+
+
